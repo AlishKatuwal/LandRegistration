@@ -346,16 +346,13 @@ export default function RegisterLandPage() {
                     <div className="relative">
                       <input 
                         type="number" 
-                        step="any"
                         placeholder="B" 
                         className={`${inputCls} pr-7`} 
-                        value={formData.area.split('-')[0] === '0' ? '' : formData.area.split('-')[0]} 
+                        value={formData.area.split('-')[0] || ''} 
                         onChange={e => {
-                          const raw = e.target.value;
-                          const val = parseFloat(raw) || 0;
-                          const k = val * 20;
-                          const d = val * 400;
-                          field('area', `${raw || '0'}-${k.toFixed(4)}-${d.toFixed(2)}`);
+                          const parts = formData.area.split('-');
+                          parts[0] = e.target.value || '0';
+                          field('area', parts.join('-'));
                         }}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">B</span>
@@ -363,16 +360,18 @@ export default function RegisterLandPage() {
                     <div className="relative">
                       <input 
                         type="number" 
-                        step="any"
                         placeholder="K" 
                         className={`${inputCls} pr-7`} 
-                        value={formData.area.split('-')[1] === '0' ? '' : formData.area.split('-')[1]} 
+                        value={formData.area.split('-')[1] || ''} 
                         onChange={e => {
-                          const raw = e.target.value;
-                          const val = parseFloat(raw) || 0;
-                          const b = val / 20;
-                          const d = val * 20;
-                          field('area', `${b.toFixed(4)}-${raw || '0'}-${d.toFixed(2)}`);
+                          let val = parseInt(e.target.value) || 0;
+                          const parts = formData.area.split('-').map(p => parseInt(p) || 0);
+                          if (val >= 20) {
+                            parts[0] += Math.floor(val / 20);
+                            val = val % 20;
+                          }
+                          parts[1] = val;
+                          field('area', parts.join('-'));
                         }}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">K</span>
@@ -380,16 +379,23 @@ export default function RegisterLandPage() {
                     <div className="relative">
                       <input 
                         type="number" 
-                        step="any"
                         placeholder="Dh" 
                         className={`${inputCls} pr-7`} 
-                        value={formData.area.split('-')[2] === '0' ? '' : formData.area.split('-')[2]} 
+                        value={formData.area.split('-')[2] || ''} 
                         onChange={e => {
-                          const raw = e.target.value;
-                          const val = parseFloat(raw) || 0;
-                          const k = val / 20;
-                          const b = val / 400;
-                          field('area', `${b.toFixed(6)}-${k.toFixed(4)}-${raw || '0'}`);
+                          let val = parseInt(e.target.value) || 0;
+                          const parts = formData.area.split('-').map(p => parseInt(p) || 0);
+                          if (val >= 20) {
+                            let extraK = Math.floor(val / 20);
+                            val = val % 20;
+                            parts[1] += extraK;
+                            if (parts[1] >= 20) {
+                              parts[0] += Math.floor(parts[1] / 20);
+                              parts[1] = parts[1] % 20;
+                            }
+                          }
+                          parts[2] = val;
+                          field('area', parts.join('-'));
                         }}
                       />
                       <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Dh</span>
